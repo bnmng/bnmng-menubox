@@ -24,6 +24,7 @@ function bnmng_menubox_shortcode( $atts ) {
 		'class'                    => 'bnmng-menubox',
 		'hide'                     => '',
 		'show'                     => '',
+		'labels'                   => '',
 	) , $atts, 'menubox' );
 
 	$post = get_post();
@@ -57,7 +58,34 @@ function bnmng_menubox_shortcode( $atts ) {
 			return strtolower( trim( $key ) );
 		}, explode( ',', trim( $atts['hide'] ) ) );
 	}
+	$labels = array(
+		'title' =>            'Navigation',
+		'previous_chapter' => 'Previous Chapter',
+		'this_chapter' =>     'This Chapter',
+		'next_chapter' =>     'Next Chapter',
+		'previous_item' =>    'Previous Item',
+		'next_item' =>        'Next Item',
+		'parent' =>           'Parent Item',
+		'children' =>         'Child Items',
+	);
 
+	$atts_labels = array();
+	if ( trim( $atts['labels'] ) > '' ) {
+		$atts['labels'] = str_replace( '\\;', 'bnmngsemicolon', $atts['labels'] );
+		$atts_labels = array_map( function( $pair ) {
+			return trim( str_replace( 'bnmngsemicolon', ';', $pair ) );
+		}, explode( ';', trim( $atts['labels'] ) ) );
+		foreach( $atts_labels as $label_pair ) {
+
+			$label_pair = str_replace( '\\:', 'bnmngcolon', $label_pair );
+			$keyed_pair = array_map( function( $pair ) {
+				return trim( str_replace( 'bnmngcolon', ':', $pair ) );
+			}, explode( ':', trim( $label_pair ) ) );
+			if( 2 == count( $keyed_pair ) ) {
+				$labels[ $keyed_pair[0] ] = $keyed_pair[1];
+			}
+		}
+	}
 
 	$show_keys = array(
 		'next_item',
@@ -182,7 +210,7 @@ function bnmng_menubox_shortcode( $atts ) {
 
 	if ( $show['title'] ) {
 		$menu .= '	<div class="' . $atts['class'] . '-title" >' . "\n";
-		$menu .= '		' . $atts['title'] . "\n";
+		$menu .= '		' . $labels['title'] . "\n";
 		$menu .= '	</div>' . "\n";
 	}
 
@@ -195,7 +223,7 @@ function bnmng_menubox_shortcode( $atts ) {
 			$menu .= '		<div class="' . $atts['class'] . '-chapter-previous" >' . "\n";
 			if ( isset( $previous_chapter ) ) {
 				$menu .= '			<div class="' . $atts['class'] . '-label" >' . "\n";
-				$menu .= '				Previous Chapter' . "\n";
+				$menu .= '				' . $labels['previous_chapter'] . "\n";
 				$menu .= '			</div>' . "\n";
 				$menu .= '			<div class="' . $atts['class'] . '-link" >' . "\n";
 				$menu .= '				<a href="' . $previous_chapter->url . '">' . $previous_chapter->title . '</a>' . "\n";
@@ -211,7 +239,7 @@ function bnmng_menubox_shortcode( $atts ) {
 			$menu .= '		<div class="' . $atts['class'] . '-chapter-this" >' . "\n";
 			if ( isset( $this_chapter ) ) {
 				$menu .= '			<div class="' . $atts['class'] . '-label" >' . "\n";
-				$menu .= '				This Chapter' . "\n";
+				$menu .= '				' . $labels['this_chapter'] . "\n";
 				$menu .= '			</div>' . "\n";
 				$menu .= '			<div class="' . $atts['class'] . '-link" >' . "\n";
 				$menu .= '				<a href="' . $this_chapter->url . '">' . $this_chapter->title . '</a>' . "\n";
@@ -226,7 +254,7 @@ function bnmng_menubox_shortcode( $atts ) {
 			$menu .= '		<div class="' . $atts['class'] . '-chapter-next" >' . "\n";
 			if ( isset( $next_chapter ) ) {
 				$menu .= '			<div class="' . $atts['class'] . '-label" >' . "\n";
-				$menu .= '				Next Chapter' . "\n";
+				$menu .= '				' . $labels['next_chapter'] . "\n";
 				$menu .= '			</div>' . "\n";
 				$menu .= '			<div class="' . $atts['class'] . '-link" >' . "\n";
 				$menu .= '				<a href="' . $next_chapter->url . '">' . $next_chapter->title . '</a>' . "\n";
@@ -250,7 +278,7 @@ function bnmng_menubox_shortcode( $atts ) {
 
 			if ( isset( $previous_item ) ) {
 				$menu .= '			<div class="' . $atts['class'] . '-label" >' . "\n";
-				$menu .= '				Previous Item' . "\n";
+				$menu .= '				' . $labels['previous_item'] . "\n";
 				$menu .= '			</div>' . "\n";
 				$menu .= '			<div class="' . $atts['class'] . '-link" >' . "\n";
 				$menu .= '				<a href="' . $previous_item->url . '">' . $previous_item->title . '</a>' . "\n";
@@ -268,7 +296,7 @@ function bnmng_menubox_shortcode( $atts ) {
 
 			if ( isset( $parent ) ) {
 				$menu .= '			<div class="' . $atts['class'] . '-label" >' . "\n";
-				$menu .= '				Parent' . "\n";
+				$menu .= '				' . $labels['parent'] . "\n";
 				$menu .= '			</div>' . "\n";
 				$menu .= '			<div class="' . $atts['class'] . '-link" >' . "\n";
 				$menu .= '				<a href="' . $parent->url . '">' . $parent->title . '</a>' . "\n";
@@ -286,7 +314,7 @@ function bnmng_menubox_shortcode( $atts ) {
 
 			if ( isset( $next_item ) ) {
 				$menu .= '			<div class="' . $atts['class'] . '-label" >' . "\n";
-				$menu .= '				Next Item' . "\n";
+				$menu .= '				' . $labels['next_item'] . "\n";
 				$menu .= '			</div>' . "\n";
 				$menu .= '			<div class="' . $atts['class'] . '-link" >' . "\n";
 				$menu .= '				<a href="' . $next_item->url . '">' . $next_item->title . '</a>' . "\n";
@@ -307,7 +335,7 @@ function bnmng_menubox_shortcode( $atts ) {
 		$menu .= '		<div class="' . $atts['class'] . '-children-list" >' . "\n";
 		if ( count( $children ) ) {
 			$menu .= '			<div class="' . $atts['class'] . '-label" >' . "\n";
-			$menu .= '				Child Items' . "\n";
+			$menu .= '				' . $labels['children'] . "\n";
 			$menu .= '			</div>' . "\n";
 			$menu .= '			<div class="' . $atts['class'] . '-link" >' . "\n";
 			$menu .= '				<ul>' . "\n" . $bnmng_walker->walk( $children, intval( $atts['child_level'] ) ) . '			</ul>' . "\n";
