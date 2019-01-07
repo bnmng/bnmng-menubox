@@ -11,12 +11,11 @@ Author URI: http://bnmng.com
 function bnmng_menubox_shortcode( $atts ) {
 	$atts = shortcode_atts ( array (
 		'menu'                     => '',
+		'occurance'                => '1',
 		'chapter_parent'           => '0',
 		'chapter_parent_occurance' => '1',
-		'occurance'                => '1',
 		'child_level'              => '0',
-		'ul'                       => 'ul',
-		'li'                       => 'li',
+		'use_divs'                 => '',
 		'title'                    => 'Navigation',
 		'class'                    => 'bnmng-menubox',
 		'hide'                     => '',
@@ -112,7 +111,14 @@ function bnmng_menubox_shortcode( $atts ) {
 			function __construct() {
 				$args = func_get_args();
 				$this->this_item = $args[0];
-				$this->atts = $args[1];
+				$this->class = $args[1];
+				if ( '' < $args[2] && 'false' != strtolower( trim( $args[2] ) ) && '0' != trim( $args[2] ) ) {
+					$this->ul = 'div';
+					$this->li = 'div';
+				} else {
+					$this->ul = 'ul';
+					$this->li = 'li';
+				}
 			}
 		
 			var $db_fields = array(
@@ -120,22 +126,22 @@ function bnmng_menubox_shortcode( $atts ) {
 				'id'     => 'db_id'
 			);
 			function start_lvl( &$output, $depth = 0, $args = array() ) {
-				$output .= '<' . $this->atts['ul'] . ' class="' . $this->atts['class'] . '">' . "\n";
+				$output .= '<' . $this->ul . ' class="' . $this->class . '">' . "\n";
 			}
 			function start_el( &$output, $item, $depth = 0, $args = array(), $id = 0 ) {
-				$output .= '<' . $this->atts['li'] . ' class="' . $this->atts['class'] . '"><a href="' . $item->url . '">' . $item->title . '</a>';
+				$output .= '<' . $this->li . ' class="' . $this->class . '"><a href="' . $item->url . '">' . $item->title . '</a>';
 			}
 			function end_el( &$output, $item, $depth = 0, $args = array(), $id = 0 ) {
-				$output .= '</' . $this->atts['li'] . '>';
+				$output .= '</' . $this->li . '>';
 			}
 			function end_lvl( &$output, $depth = 0, $args = array() ) {
-				$output .= '</' . $this->atts['ul'] . '>';
+				$output .= '</' . $this->ul . '>';
 			}
 
 			function display_element( $element, &$children_elements, $max_depth, $depth=0, $args, &$output ) {
 			
 				if ( $element->ID == $this->this_item->ID ) {
-					$output .= '<' . $this->atts['li'] . ' class="' . $this->atts['class'] . '">' . $element->title . '';
+					$output .= '<' . $this->li . ' class="' . $this->class . '">' . $element->title . '';
 					return;
 				}
 				parent::display_element( $element, $children_elements, $max_depth, $depth, $args, $output );
@@ -199,7 +205,7 @@ function bnmng_menubox_shortcode( $atts ) {
 		$next_item = $all_items[ $this_i + 1 ];
 	}
 	
-	$bnmng_walker = new bnmng_Walker( $this_item, $atts );
+	$bnmng_walker = new bnmng_Walker( $this_item, $atts['class'],  $atts['use_divs'] );
 
 	$menu = '';
 
