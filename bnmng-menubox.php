@@ -8,9 +8,6 @@ Author: bnmng
 Author URI: http://bnmng.com
 */
 
-// The next page is the next in line no matter what
-// The double next page is the page beyond the next page that is at a level higher than the next page
-
 function bnmng_menubox_shortcode( $atts ) {
 	$atts = shortcode_atts ( array (
 		'menu'                     => '',
