@@ -9,6 +9,31 @@ Author URI: http://bnmng.com
 */
 
 function bnmng_menubox_shortcode( $atts ) {
+
+	function bnmng_true( $item ) {
+		$item = strtolower( trim( $item ) );
+		if ( 'false' == $item ) {
+			$item = false;
+		}
+		if( $item ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	echo '<pre>' , "\n";
+
+	echo 'true:' , "\n";
+	echo bnmng_true(1), "\n";
+
+	echo 'false:' , "\n";
+	echo bnmng_true(0), "\n";
+	echo bnmng_true(' 0 '), "\n";
+	echo bnmng_true('false'), "\n";
+
+	echo '</pre>' , "\n";
+
 	$atts = shortcode_atts ( array (
 		'menu'                     => '',
 		'occurance'                => '1',
@@ -105,14 +130,14 @@ function bnmng_menubox_shortcode( $atts ) {
 		}
 	}
 
-	if ( ! class_exists('bnmng_Walker') ) {
-		class bnmng_Walker extends Walker {
+	if ( ! class_exists('bnmng_Menubox_Walker') ) {
+		class bnmng_Menubox_Walker extends Walker {
 
 			function __construct() {
 				$args = func_get_args();
 				$this->this_item = $args[0];
 				$this->class = $args[1];
-				if ( '' < $args[2] && 'false' != strtolower( trim( $args[2] ) ) && '0' != trim( $args[2] ) ) {
+				if ( '' < $args[2] && 'false' != strtolower( trim( $args[2] ) ) && 0 != trim( $args[2] ) ) {
 					$this->ul = 'div';
 					$this->li = 'div';
 				} else {
@@ -205,7 +230,7 @@ function bnmng_menubox_shortcode( $atts ) {
 		$next_item = $all_items[ $this_i + 1 ];
 	}
 	
-	$bnmng_walker = new bnmng_Walker( $this_item, $atts['class'],  $atts['use_divs'] );
+	$bnmng_menubox_walker = new bnmng_Menubox_Walker( $this_item, $atts['class'],  $atts['use_divs'] );
 
 	$menu = '';
 
@@ -341,7 +366,12 @@ function bnmng_menubox_shortcode( $atts ) {
 			$menu .= '				' . $labels['children'] . "\n";
 			$menu .= '			</div>' . "\n";
 			$menu .= '			<div class="' . $atts['class'] . '-link" >' . "\n";
-			$menu .= '				<ul>' . "\n" . $bnmng_walker->walk( $children, intval( $atts['child_level'] ) ) . '			</ul>' . "\n";
+			if ( '' < $atts['use_divs'] && 'false' != strtolower( trim( $atts['use_divs'] ) ) && '0' != trim( $atts['use_divs'] ) ) {
+				$ul = 'div';
+			} else {
+				$ul = 'ul';
+			}
+			$menu .= '				<' . $ul . '>' . "\n" . $bnmng_menubox_walker->walk( $children, intval( $atts['child_level'] ) ) . '			</' . $ul . '>' . "\n";
 			$menu .= '			</div>' . "\n";
 		}
 		$menu .= '		</div>' . "\n";
